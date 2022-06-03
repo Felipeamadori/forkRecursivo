@@ -4,22 +4,29 @@
 #include <sys/wait.h>
 #include <time.h>
 
-void create_child(int p){
+
+
+void create_child(int p, char **filhos, int pTotal){
 
     int pid;
     
-    if(p <= 0){
-        return;
-    }
-    pid = fork();
-    if(pid > 0){
+    if(p <= 0) return; // encerra recursao
+    
+    pid = fork(); // criar processo filho
+    if(pid == -1) printf("Erro no fork\n");
+    
+    if(pid > 0){ // codigo do processo pai
+        int f = atoi(filhos[pTotal - p]);
+        printf("f=%d\n",f);
         wait(NULL);
-    } else if(pid == 0){
+        f--; 
+        if (f > 0) create_child(p ,filhos, pTotal); // criar novamente
+        else return;
+    
+    }else if(pid == 0){
         printf("Sou processo %d, meu pai eh %d\n", getpid(), getppid());
-        create_child(p-1);
+        create_child(p-1, filhos,pTotal); // criar os processos em cascata recursivamente
     }
-    // retorna onde o pai esta na arvore quando terminou de esperar pelo filho
-    return p;
 }
 
 int main(int argc, char **argv)
@@ -28,17 +35,10 @@ int main(int argc, char **argv)
         printf("Necessario pelo menos um argumento\n");
     }
 
-    int pos;
-    int f = atoi(argv[1]);
+    int const pTotal = argc;
     
     printf("Processo %d root\n", getpid());
-    
-    create_child(argc-1);
-
-    // verificar profundidade quando o pai retorna depois de esperar o filho
-    if(filhos > ?)
-    create_child
-    
+    create_child(argc - 1, argv, pTotal);
 
 
 
