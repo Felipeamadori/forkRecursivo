@@ -11,24 +11,27 @@ void create_child(int p, char **filhos, int pTotal, int* pf){
     
     if(p <= 0) return; // encerra recursao
 
-    if (pf == NULL)
-    {
-        int f = atoi(filhos[pTotal - p]);
-        pf = &f;
-    }
     int pid;
     
     pid = fork(); // criar processo filho
     if(pid == -1) printf("Erro no fork\n");
     
     if(pid > 0){ // codigo do processo pai
+        
+        if (pf == NULL){
+            int f = atoi(filhos[pTotal - p]);
+            pf = &f;
+        }
+        
         wait(NULL);
         *pf = *pf-1; 
-        if (*pf > 0) create_child(p ,filhos, pTotal, pf); // criar novamente
+        
+        if (*pf > 0) create_child(p,filhos, pTotal, pf); // criar novamente
         else return;
     
     }else if(pid == 0){
         printf("Sou processo %d, meu pai eh %d\n", getpid(), getppid());
+        pf = NULL;
         create_child(p-1, filhos,pTotal, pf); // criar os processos em cascata recursivamente
     }
 }
